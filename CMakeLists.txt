@@ -82,11 +82,7 @@ set(SOURCE_FILES
     src/ui/browsehelper.cpp
     src/ui/channelbrowser.cpp
     src/ui/forms/emojimenu.cpp
-    src/ui/forms/livechat/giftredemptionmessage.cpp
     src/ui/forms/livechat/livechatwindow.cpp
-    src/ui/forms/livechat/paidmessage.cpp
-    src/ui/forms/livechat/specialmessage.cpp
-    src/ui/forms/livechat/textmessage.cpp
     src/ui/forms/settings/channelfiltertable.cpp
     src/ui/forms/settings/settingsform.cpp
     src/ui/forms/settings/termfilterview.cpp
@@ -123,6 +119,14 @@ set(SOURCE_FILES
     src/ui/widgets/labels/emojilabel.cpp
     src/ui/widgets/labels/iconlabel.cpp
     src/ui/widgets/labels/tubelabel.cpp
+    src/ui/widgets/livechat/elements/emojielement.cpp
+    src/ui/widgets/livechat/elements/messageelement.cpp
+    src/ui/widgets/livechat/elements/messagetext.cpp
+    src/ui/widgets/livechat/elements/textelement.cpp
+    src/ui/widgets/livechat/messages/giftredemptionmessage.cpp
+    src/ui/widgets/livechat/messages/paidmessage.cpp
+    src/ui/widgets/livechat/messages/specialmessage.cpp
+    src/ui/widgets/livechat/messages/textmessage.cpp
     src/ui/widgets/renderers/backstage/backstagepollchoicerenderer.cpp
     src/ui/widgets/renderers/backstage/backstagepollrenderer.cpp
     src/ui/widgets/renderers/backstage/backstagepostrenderer.cpp
@@ -158,11 +162,7 @@ set(HEADERS
     src/ui/browsehelper.h
     src/ui/channelbrowser.h
     src/ui/forms/emojimenu.h
-    src/ui/forms/livechat/giftredemptionmessage.h
     src/ui/forms/livechat/livechatwindow.h
-    src/ui/forms/livechat/paidmessage.h
-    src/ui/forms/livechat/specialmessage.h
-    src/ui/forms/livechat/textmessage.h
     src/ui/forms/settings/channelfiltertable.h
     src/ui/forms/settings/settingsform.h
     src/ui/forms/settings/termfilterview.h
@@ -200,6 +200,14 @@ set(HEADERS
     src/ui/widgets/labels/emojilabel.h
     src/ui/widgets/labels/iconlabel.h
     src/ui/widgets/labels/tubelabel.h
+    src/ui/widgets/livechat/elements/emojielement.h
+    src/ui/widgets/livechat/elements/messageelement.h
+    src/ui/widgets/livechat/elements/messagetext.h
+    src/ui/widgets/livechat/elements/textelement.h
+    src/ui/widgets/livechat/messages/giftredemptionmessage.h
+    src/ui/widgets/livechat/messages/paidmessage.h
+    src/ui/widgets/livechat/messages/specialmessage.h
+    src/ui/widgets/livechat/messages/textmessage.h
     src/ui/widgets/renderers/backstage/backstagepollchoicerenderer.h
     src/ui/widgets/renderers/backstage/backstagepollrenderer.h
     src/ui/widgets/renderers/backstage/backstagepostrenderer.h

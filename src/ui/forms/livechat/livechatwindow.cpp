@@ -5,10 +5,10 @@
 #include "ui/widgets/labels/tubelabel.h"
 #include "utils/uiutils.h"
 #include "ytemoji.h"
-#include "giftredemptionmessage.h"
-#include "paidmessage.h"
-#include "specialmessage.h"
-#include "textmessage.h"
+#include "ui/widgets/livechat/messages/giftredemptionmessage.h"
+#include "ui/widgets/livechat/messages/paidmessage.h"
+#include "ui/widgets/livechat/messages/specialmessage.h"
+#include "ui/widgets/livechat/messages/textmessage.h"
 #include <QTimer>
 
 LiveChatWindow::LiveChatWindow(QWidget* parent)
