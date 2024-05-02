@@ -173,7 +173,7 @@ void BackstagePostRenderer::setImageLabelData(const HttpReply& reply, QLabel* im
     QPixmap pixmap;
     pixmap.loadFromData(reply.body());
     imageLabel->setPixmap(pixmap);
-    emit dynamicSizeChange(sizeHint());
+    adjustSize();
 }
 
 void BackstagePostRenderer::setPoll(const InnertubeObjects::Poll& poll)
@@ -191,7 +191,7 @@ void BackstagePostRenderer::setVideo(const InnertubeObjects::Video& video)
 
     BrowseVideoRenderer* videoRenderer = new BrowseVideoRenderer(this);
     videoRenderer->setData(video);
-    videoRenderer->setTargetElisionWidth(width() - 100);
+    videoRenderer->titleLabel->setFixedWidth(width() - 100);
     innerLayout->addWidget(videoRenderer);
 }
 
@@ -231,5 +231,4 @@ void BackstagePostRenderer::toggleReadMore()
     }
 
     adjustSize();
-    emit dynamicSizeChange(sizeHint());
 }

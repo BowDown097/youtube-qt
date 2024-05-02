@@ -87,7 +87,8 @@ void WatchViewPlayer::startTracking(const InnertubeEndpoints::PlayerResponse& pl
         watchtimeTimer = new QTimer(this);
         watchtimeTimer->setInterval(5000);
         watchtimeTimer->start();
-        connect(watchtimeTimer, &QTimer::timeout, this, std::bind(&StatsUtils::reportWatchtime, playerResp, media->position()));
+        QString pos = QString::number(media->position());
+        connect(watchtimeTimer, &QTimer::timeout, this, std::bind(&StatsUtils::reportWatchtime, playerResp, pos, pos));
     }
 #else
     wePlayer->setPlayerResponse(playerResp);

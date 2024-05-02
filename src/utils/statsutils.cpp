@@ -5,7 +5,7 @@
 
 namespace StatsUtils
 {
-    QString getCpn()
+    QString genCpn()
     {
         QString out;
         out.reserve(16);
@@ -15,54 +15,79 @@ namespace StatsUtils
         return out;
     }
 
+    void setQueryItem(QUrlQuery& query, const QString& key, const QString& value)
+    {
+        query.removeQueryItem(key); // there should never be more than 1 of each item, so this should suffice
+        query.addQueryItem(key, value);
+    }
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+    QUrlQuery constructQuery(const QUrlQuery& base, const InnertubeClient& itc, const QString& st = "",
+                             const QString& et = "")
+#else
+    QUrlQuery constructQuery(QUrlQuery&& base, const InnertubeClient& itc, const QString& st = "",
+                             const QString& et = "")
+#endif
+    {
+        QUrlQuery out(base);
+
+        setQueryItem(out, "ns", "yt");
+        setQueryItem(out, "cmt", et);
+        setQueryItem(out, "cpn", genCpn());
+        setQueryItem(out, "state", "playing");
+        setQueryItem(out, "volume", "100");
+        setQueryItem(out, "lact", QString::number(QRandomGenerator::global()->bounded(1000, 15000)));
+        setQueryItem(out, "fmt", "136");
+        setQueryItem(out, "afmt", "251");
+        setQueryItem(out, "euri", "");
+        setQueryItem(out, "cbr", itc.browserName);
+        setQueryItem(out, "cbrver", itc.browserVersion);
+        setQueryItem(out, "c", QString::number(static_cast<int>(itc.clientType)));
+        setQueryItem(out, "cver", itc.clientVersion);
+        setQueryItem(out, "cplayer", "UNIPLAYER");
+        setQueryItem(out, "cos", itc.osName);
+        setQueryItem(out, "cosver", itc.osVersion);
+        setQueryItem(out, "cplatform", itc.platform);
+        setQueryItem(out, "hl", itc.hl + "_" + itc.gl);
+        setQueryItem(out, "gl", itc.gl);
+        setQueryItem(out, "idpj", QString::number(-QRandomGenerator::global()->bounded(10)));
+        setQueryItem(out, "ldpj", QString::number(-QRandomGenerator::global()->bounded(40)));
+        setQueryItem(out, "rtn", et);
+        setQueryItem(out, "rt", et);
+        if (!et.isEmpty())
+            setQueryItem(out, "rti", QString::number((int)et.toFloat()));
+        setQueryItem(out, "st", st);
+        setQueryItem(out, "et", et);
+        setQueryItem(out, "ver", "2");
+        setQueryItem(out, "muted", "0");
+
+        return out;
+    }
+
+    void setNeededHeaders(Http& http, InnertubeContext* context, InnertubeAuthStore* authStore)
+    {
+        if (authStore->populated())
+        {
+            http.addRequestHeader("Cookie", authStore->toCookieString().toUtf8());
+            http.addRequestHeader("X-Goog-AuthUser", "0");
+        }
+
+        http.addRequestHeader("X-Goog-Visitor-Id", context->client.visitorData.toLatin1());
+        http.addRequestHeader("X-YouTube-Client-Name", QByteArray::number(static_cast<int>(context->client.clientType)));
+        http.addRequestHeader("X-YouTube-Client-Version", context->client.clientVersion.toLatin1());
+    }
+
     void reportPlayback(const InnertubeEndpoints::PlayerResponse& playerResp)
     {
-        InnertubeClient itc = InnerTube::instance()->context()->client;
-
         QUrlQuery playbackQuery(QUrl(playerResp.playbackTracking.videostatsPlaybackUrl));
+        playbackQuery.removeQueryItem("fexp");
+
         QUrl outPlaybackUrl("https://www.youtube.com/api/stats/playback");
-        QUrlQuery outPlaybackQuery;
-
-        QList<QPair<QString, QString>> map =
-        {
-            { "ns", "yt" },
-            { "el", "detailpage" },
-            { "cpn", getCpn() },
-            { "ver", "2" },
-            { "fmt", "243" },
-            { "fs", "0" },
-            { "rt", QString::number(QRandomGenerator::global()->bounded(191) + 10) },
-            { "euri", "" },
-            { "lact", QString::number(QRandomGenerator::global()->bounded(7001) + 1000) },
-            { "cl", playbackQuery.queryItemValue("cl") },
-            { "mos", "0" },
-            { "volume", "100" },
-            { "cbr", itc.browserName },
-            { "cbrver", itc.browserVersion },
-            { "c", QString::number(static_cast<int>(itc.clientType)) },
-            { "cver", itc.clientVersion },
-            { "cplayer", "UNIPLAYER" },
-            { "cos", itc.osName },
-            { "cosver", itc.osVersion },
-            { "cplatform", itc.platform },
-            { "hl", itc.hl + "_" + itc.gl },
-            { "cr", itc.gl },
-            { "uga", playbackQuery.queryItemValue("uga") },
-            { "len", playbackQuery.queryItemValue("len") },
-            { "fexp", playbackQuery.queryItemValue("fexp") },
-            { "rtn", "4" },
-            { "afmt", "251" },
-            { "muted", "0" },
-            { "docid", playbackQuery.queryItemValue("docid") },
-            { "ei", playbackQuery.queryItemValue("ei") },
-            { "plid", playbackQuery.queryItemValue("plid") },
-            { "sdetail", playbackQuery.queryItemValue("sdetail") },
-            { "of", playbackQuery.queryItemValue("of") },
-            { "vm", playbackQuery.queryItemValue("vm") }
-        };
-
-        outPlaybackQuery.setQueryItems(map);
-        outPlaybackUrl.setQuery(outPlaybackQuery);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+        outPlaybackUrl.setQuery(constructQuery(playbackQuery, InnerTube::instance()->context()->client));
+#else
+        outPlaybackUrl.setQuery(constructQuery(std::move(playbackQuery), InnerTube::instance()->context()->client));
+#endif
 
         Http http;
         http.setMaxRetries(0);
@@ -70,81 +95,22 @@ namespace StatsUtils
         http.get(outPlaybackUrl);
     }
 
-    void reportWatchtime(const InnertubeEndpoints::PlayerResponse& playerResp, long long position)
+    void reportWatchtime(const InnertubeEndpoints::PlayerResponse& playerResp, const QString& st, const QString& et)
     {
-        InnertubeClient itc = InnerTube::instance()->context()->client;
-
         QUrlQuery watchtimeQuery(QUrl(playerResp.playbackTracking.videostatsWatchtimeUrl));
+        watchtimeQuery.removeQueryItem("fexp");
+
         QUrl outWatchtimeUrl("https://www.youtube.com/api/stats/watchtime");
-        QUrlQuery outWatchtimeQuery;
-
-        QString rt = QString::number(QRandomGenerator::global()->bounded(191) + 10);
-        QString posStr = QString::number(position);
-
-        QList<QPair<QString, QString>> map =
-        {
-            { "ns", "yt" },
-            { "el", "detailpage" },
-            { "cpn", getCpn() },
-            { "ver", "2" },
-            { "fmt", "243" },
-            { "fs", "0" },
-            { "rt", rt },
-            { "euri", "" },
-            { "lact", QString::number(QRandomGenerator::global()->bounded(7001) + 1000) },
-            { "cl", watchtimeQuery.queryItemValue("cl") },
-            { "state", "playing" },
-            { "volume", "100" },
-            { "subscribed", watchtimeQuery.queryItemValue("subscribed") },
-            { "cbr", itc.browserName },
-            { "cbrver", itc.browserVersion },
-            { "c", QString::number(static_cast<int>(itc.clientType)) },
-            { "cver", itc.clientVersion },
-            { "cplayer", "UNIPLAYER" },
-            { "cos", itc.osName },
-            { "cosver", itc.osVersion },
-            { "cplatform", itc.platform },
-            { "hl", itc.hl + "_" + itc.gl },
-            { "cr", itc.gl },
-            { "uga", watchtimeQuery.queryItemValue("uga") },
-            { "len", watchtimeQuery.queryItemValue("len") },
-            { "afmt", "251" },
-            { "idpj", "-1" },
-            { "ldpj", "-10" },
-            { "rti", rt },
-            { "st", posStr },
-            { "et", posStr },
-            { "muted", "0" },
-            { "docid", watchtimeQuery.queryItemValue("docid") },
-            { "ei", watchtimeQuery.queryItemValue("ei") },
-            { "plid", watchtimeQuery.queryItemValue("plid") },
-            { "sdetail", watchtimeQuery.queryItemValue("sdetail") },
-            { "of", watchtimeQuery.queryItemValue("of") },
-            { "vm", watchtimeQuery.queryItemValue("vm") }
-        };
-
-        outWatchtimeQuery.setQueryItems(map);
-        outWatchtimeUrl.setQuery(outWatchtimeQuery);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+        outWatchtimeUrl.setQuery(constructQuery(watchtimeQuery, InnerTube::instance()->context()->client, st, et));
+#else
+        outWatchtimeUrl.setQuery(constructQuery(std::move(watchtimeQuery),
+            InnerTube::instance()->context()->client, st, et));
+#endif
 
         Http http;
         http.setMaxRetries(0);
         setNeededHeaders(http, InnerTube::instance()->context(), InnerTube::instance()->authStore());
         http.get(outWatchtimeUrl);
-    }
-
-    void setNeededHeaders(Http& http, InnertubeContext* context, InnertubeAuthStore* authStore)
-    {
-        if (authStore->populated())
-        {
-            http.addRequestHeader("Authorization", authStore->generateSAPISIDHash().toUtf8());
-            http.addRequestHeader("Cookie", authStore->toCookieString().toUtf8());
-            http.addRequestHeader("X-Goog-AuthUser", "0");
-        }
-
-        http.addRequestHeader("Content-Type", "application/json");
-        http.addRequestHeader("X-Goog-Visitor-Id", context->client.visitorData.toLatin1());
-        http.addRequestHeader("X-YOUTUBE-CLIENT-NAME", QByteArray::number(static_cast<int>(context->client.clientType)));
-        http.addRequestHeader("X-YOUTUBE-CLIENT-VERSION", context->client.clientVersion.toLatin1());
-        http.addRequestHeader("X-ORIGIN", "https://www.youtube.com");
     }
 }

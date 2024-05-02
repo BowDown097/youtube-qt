@@ -11,6 +11,7 @@ class Reel;
 class Video;
 }
 
+class DynamicListWidgetItem;
 class QLabel;
 class QLayout;
 class QListWidget;
@@ -35,7 +36,6 @@ public:
     static void addWrappedLabelToList(QListWidget* list, const QString& text);
     static void clearLayout(QLayout* layout);
     static void copyToClipboard(const QString& text);
-    static void elide(QLabel* label, int targetWidth);
     static QIcon iconThemed(const QString& name, const QPalette& pal = QPalette());
     static QPixmap pixmapRounded(const QPixmap& pixmap, double xRadius, double yRadius);
     static QPixmap pixmapThemed(const QString& name, bool fromQIcon = false, const QSize& size = QSize(), const QPalette& pal = QPalette());

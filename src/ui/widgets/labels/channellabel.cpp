@@ -1,6 +1,7 @@
 #include "channellabel.h"
 #include "channelbadgelabel.h"
 #include "innertube/objects/channel/metadatabadge.h"
+#include "utils/uiutils.h"
 #include <QBoxLayout>
 
 ChannelLabel::ChannelLabel(QWidget* parent)
@@ -8,6 +9,8 @@ ChannelLabel::ChannelLabel(QWidget* parent)
 {
     text->setClickable(true, true);
     text->setContextMenuPolicy(Qt::CustomContextMenu);
+    text->setWordWrap(true);
+    UIUtils::setMaximumLines(text, 1);
 
     layout->addWidget(text);
     layout->setContentsMargins(0, 0, 0, 0);

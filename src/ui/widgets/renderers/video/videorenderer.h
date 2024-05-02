@@ -1,6 +1,8 @@
 #ifndef VIDEORENDERER_H
 #define VIDEORENDERER_H
-#include <QWidget>
+#include "ui/widgets/labels/channellabel.h"
+#include "ui/widgets/labels/elidedlabel.h"
+#include "videothumbnailwidget.h"
 
 namespace InnertubeObjects
 {
@@ -11,11 +13,7 @@ class Video;
 
 namespace PreloadData { class WatchView; }
 
-class ChannelLabel;
-class ElidedTubeLabel;
 class HttpReply;
-class TubeLabel;
-class VideoThumbnailWidget;
 
 class VideoRenderer : public QWidget
 {
@@ -24,17 +22,15 @@ public:
     ChannelLabel* channelLabel;
     TubeLabel* metadataLabel;
     VideoThumbnailWidget* thumbnail;
-    ElidedTubeLabel* titleLabel;
+    ElidedLabel* titleLabel;
 
     explicit VideoRenderer(QWidget* parent = nullptr);
     void setData(const InnertubeObjects::Reel& reel);
     void setData(const InnertubeObjects::Video& video);
-    void setTargetElisionWidth(int width) { targetElisionWidth = width; }
     void setThumbnailSize(const QSize& size);
 private:
     QString channelId;
     int progress = 0;
-    int targetElisionWidth = 0;
     QString videoId;
     PreloadData::WatchView* watchPreloadData{};
 
@@ -43,7 +39,6 @@ private slots:
     void copyChannelUrl();
     void copyDirectUrl();
     void copyVideoUrl();
-    void elideTitle();
     void navigateChannel();
     void navigateVideo();
     void setDeArrowData(const HttpReply& reply, const QString& fallbackThumbUrl);

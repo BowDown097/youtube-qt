@@ -1,9 +1,7 @@
 #include "watchnextfeed.h"
 #include "continuablelistwidget.h"
 #include "innertube/endpoints/video/next.h"
-#include "ui/widgets/labels/elidedtubelabel.h"
 #include "ui/widgets/renderers/video/browsevideorenderer.h"
-#include "ui/widgets/renderers/video/videothumbnailwidget.h"
 #include "utils/uiutils.h"
 #include <QCoreApplication>
 
@@ -52,8 +50,7 @@ void WatchNextFeed::setData(const InnertubeEndpoints::Next& endpoint)
     {
         BrowseVideoRenderer* renderer = new BrowseVideoRenderer(recommended);
         renderer->thumbnail->setPreferredSize(QSize(168, 94));
-        renderer->titleLabel->setFixedWidth(recommended->width() - 220);
-        renderer->titleLabel->setWordWrap(true);
+        renderer->titleLabel->setMaximumWidth(recommended->width() - 220);
         UIUtils::setMaximumLines(renderer->titleLabel, 2);
         renderer->setData(recommendedVideo);
 

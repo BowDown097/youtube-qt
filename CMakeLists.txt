@@ -101,6 +101,7 @@ set(SOURCE_FILES
     src/ui/views/watchview_ui.cpp
     src/ui/views/watchviewplayer.cpp
     src/ui/widgets/continuablelistwidget.cpp
+    src/ui/widgets/dynamiclistwidgetitem.cpp
     src/ui/widgets/findbar.cpp
     src/ui/widgets/flowlayout.cpp
     src/ui/widgets/watchnextfeed.cpp
@@ -110,7 +111,7 @@ set(SOURCE_FILES
     src/ui/widgets/accountmenu/accountswitcherwidget.cpp
     src/ui/widgets/labels/channelbadgelabel.cpp
     src/ui/widgets/labels/channellabel.cpp
-    src/ui/widgets/labels/elidedtubelabel.cpp
+    src/ui/widgets/labels/elidedlabel.cpp
     src/ui/widgets/labels/emojilabel.cpp
     src/ui/widgets/labels/iconlabel.cpp
     src/ui/widgets/labels/tubelabel.cpp
@@ -141,6 +142,7 @@ set(SOURCE_FILES
 
 set(HEADERS
     src/eastereggs.h
+    src/genericeventfilter.h
     src/mainwindow.h
     src/qttubeapplication.h
     src/ytemoji.h
@@ -180,6 +182,7 @@ set(HEADERS
     src/ui/views/watchview_ui.h
     src/ui/views/watchviewplayer.h
     src/ui/widgets/continuablelistwidget.h
+    src/ui/widgets/dynamiclistwidgetitem.h
     src/ui/widgets/findbar.h
     src/ui/widgets/flowlayout.h
     src/ui/widgets/watchnextfeed.h
@@ -189,7 +192,7 @@ set(HEADERS
     src/ui/widgets/accountmenu/accountswitcherwidget.h
     src/ui/widgets/labels/channelbadgelabel.h
     src/ui/widgets/labels/channellabel.h
-    src/ui/widgets/labels/elidedtubelabel.h
+    src/ui/widgets/labels/elidedlabel.h
     src/ui/widgets/labels/emojilabel.h
     src/ui/widgets/labels/iconlabel.h
     src/ui/widgets/labels/tubelabel.h

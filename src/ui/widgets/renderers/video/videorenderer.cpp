@@ -7,7 +7,7 @@
 #include "ui/views/preloaddata.h"
 #include "ui/views/viewcontroller.h"
 #include "ui/widgets/labels/channellabel.h"
-#include "ui/widgets/labels/elidedtubelabel.h"
+#include "ui/widgets/labels/elidedlabel.h"
 #include "videothumbnailwidget.h"
 #include <QMenu>
 #include <QMessageBox>
@@ -17,17 +17,17 @@ VideoRenderer::VideoRenderer(QWidget* parent)
       channelLabel(new ChannelLabel(this)),
       metadataLabel(new TubeLabel(this)),
       thumbnail(new VideoThumbnailWidget(this)),
-      titleLabel(new ElidedTubeLabel(this))
+      titleLabel(new ElidedLabel(this))
 {
     titleLabel->setClickable(true, true);
     titleLabel->setContextMenuPolicy(Qt::CustomContextMenu);
     titleLabel->setFont(QFont(qApp->font().toString(), qApp->font().pointSize() + 2, QFont::Bold));
+    UIUtils::setMaximumLines(titleLabel, 1);
 
     connect(channelLabel->text, &TubeLabel::clicked, this, &VideoRenderer::navigateChannel);
     connect(channelLabel->text, &TubeLabel::customContextMenuRequested, this, &VideoRenderer::showChannelContextMenu);
     connect(thumbnail, &VideoThumbnailWidget::clicked, this, &VideoRenderer::navigateVideo);
-    connect(thumbnail, &VideoThumbnailWidget::thumbnailSet, this, &VideoRenderer::elideTitle);
-    connect(titleLabel, &ElidedTubeLabel::clicked, this, &VideoRenderer::navigateVideo);
+    connect(titleLabel, &ElidedLabel::clicked, this, &VideoRenderer::navigateVideo);
     connect(titleLabel, &TubeLabel::customContextMenuRequested, this, &VideoRenderer::showTitleContextMenu);
 }
 
@@ -68,12 +68,6 @@ void VideoRenderer::copyDirectUrl()
 void VideoRenderer::copyVideoUrl()
 {
     UIUtils::copyToClipboard("https://www.youtube.com/watch?v=" + videoId);
-}
-
-void VideoRenderer::elideTitle()
-{
-    if (targetElisionWidth > 0)
-        UIUtils::elide(titleLabel, targetElisionWidth);
 }
 
 void VideoRenderer::navigateChannel()

@@ -55,8 +55,6 @@ private slots:
     void showChannelContextMenu(const QPoint& pos);
     void showPublishedTimeContextMenu(const QPoint& pos);
     void toggleReadMore();
-signals:
-    void dynamicSizeChange(const QSize& newSize);
 };
 
 #endif // BACKSTAGEPOSTRENDERER_H

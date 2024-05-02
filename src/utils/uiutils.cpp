@@ -6,7 +6,7 @@
 #include "innertube/objects/video/video.h"
 #include "mainwindow.h"
 #include "qttubeapplication.h"
-#include "ui/widgets/labels/tubelabel.h"
+#include "ui/widgets/dynamiclistwidgetitem.h"
 #include "ui/widgets/renderers/backstage/backstagepostrenderer.h"
 #include "ui/widgets/renderers/browsechannelrenderer.h"
 #include "ui/widgets/renderers/video/browsevideorenderer.h"
@@ -51,9 +51,8 @@ void UIUtils::addBackstagePostToList(QListWidget* list, const InnertubeObjects::
     BackstagePostRenderer* renderer = new BackstagePostRenderer;
     renderer->setData(post);
 
-    QListWidgetItem* item = addWidgetToList(list, renderer);
-    QObject::connect(renderer, &BackstagePostRenderer::dynamicSizeChange,
-                     std::bind(&QListWidgetItem::setSizeHint, item, std::placeholders::_1));
+    DynamicListWidgetItem* item = new DynamicListWidgetItem(renderer, list);
+    item->addToList();
 }
 
 void UIUtils::addBoldLabelToList(QListWidget* list, const QString& text)
@@ -155,7 +154,7 @@ VideoRenderer* UIUtils::constructVideoRenderer(QListWidget* list)
     else
     {
         renderer = new BrowseVideoRenderer;
-        renderer->setTargetElisionWidth(list->width() - 240);
+        renderer->titleLabel->setMaximumWidth(list->width() - 240);
     }
 
     return renderer;
@@ -173,14 +172,6 @@ void UIUtils::copyToClipboard(const QString& text)
 #ifdef Q_OS_LINUX
     QThread::msleep(1);
 #endif
-}
-
-void UIUtils::elide(QLabel* label, int targetWidth)
-{
-    QFontMetrics fm(label->font());
-    QString elidedText = fm.elidedText(label->text(), Qt::ElideRight, targetWidth);
-    label->setFixedWidth(targetWidth);
-    label->setText(elidedText);
 }
 
 QIcon UIUtils::iconThemed(const QString& name, const QPalette& pal)
